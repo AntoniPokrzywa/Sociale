@@ -3,7 +3,7 @@ async function runApp(){
   const menuButton = document.getElementById('menuButton');
   const menuHeader = document.getElementById('menuHeader');
   const userName = menuHeader.getAttribute('context-username');
-  window.init = initMap();
+  initMap();
   let currentStep;
   async function getUserStatus(){
     response = await fetch("/map/get-user-status/")
@@ -40,13 +40,8 @@ async function runApp(){
       menuButton.textContent = 'End Ride';
       menuHeader.textContent = 'Enjoy your trip!';
       menuButton.onclick = async () => {
-        response = await endRide("/map/end-rental/");
-        if (response ==200){
-          currentStep = 'scan';
-        }else if (response ==400){
-          menuHeader.textContent = 'You cant end ride here';    
-        }
-        
+        await endRide("/map/end-rental/");
+        currentStep = 'scan';
         updateUI();
       };
    }};
@@ -68,18 +63,12 @@ async function GetBikeCode(bike_id,link) {
   
 }
 
+
 async function GetBikes(){
   const response = await fetch("/map/get-bike-positions/");
   const responseData = await response.json();
   return responseData.bikes
 }
-
-async function GetPolygons(){
-  const response = await fetch("/map/get-polygons/");
-  const responseData = await response.json();
-  return responseData.polygons
-}
-
 async function AddMarker(bike){
   const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
   const marker = new AdvancedMarkerElement({
@@ -133,58 +122,30 @@ async function SetMarkers(){
     }
   }
 }
-async function SetPolygons(){
-  const polygons = await GetPolygons()
-  for (let poly of polygons){
-    const polygon = new google.maps.Polygon({
-    paths: poly.coords,
-    strokeColor: "#2ad438",
-    strokeOpacity: 0.8,
-    strokeWeight: 2,
-    fillColor: "#2ad438",
-    fillOpacity: 0.35
-    });
-    polygon.setMap(map);
-  }
-}
-function getLocation() {
-  return new Promise((resolve, reject) => {
-      if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(
-              (position) => {
-                  const location = {
-                      "lat": position.coords.latitude,
-                      "lon": position.coords.longitude
-                  };
-                  resolve(location);
-              },
-              (error) => reject(error)
-          );
-      } else {
-          reject("Geolocation is not supported by this browser.");
-      }
-  });
-}
 
 async function endRide(link) {
-  let location;
-  try {
-    location = await getLocation();
-    console.log("Location:", location);
-  } catch (error) {
-    console.error("Error getting location:", error);
-  }
+  if (navigator.geolocation) {
+      let location;
+      navigator.geolocation.getCurrentPosition(async function(position) {
 
-  url = new URL(link, window.location.origin)
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(location)});
-  console.log(response)
-}
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        location = { "lat": lat, "lon": lon };
+        url = new URL(link, window.location.origin)
+
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(location)});
+      });
+      } 
+      else {
+          alert("Geolocation is not supported by this browser.");
+      }
+  }
 
 (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
     key: "AIzaSyDqaEmMUlCcnwrTtVb0e467mhQryaPAJTI",
@@ -203,10 +164,8 @@ async function endRide(link) {
       center: { lat: 50.063481, lng: 19.932906 },
       zoom: 16,
       disableDefaultUI: true,
-      mapId: 'f203d7d130752d37'
-    });
+      mapId: 'f203d7d130752d37'});
 
-  await SetPolygons();
   await SetMarkers();
   setInterval(SetMarkers, 10000);
 }

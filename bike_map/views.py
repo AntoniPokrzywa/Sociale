@@ -1,10 +1,9 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
-from .models import Bike, Rental, Parking
+from .models import Bike, Rental
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
-from . utils import valid_location
 # from cryptography.fernet import Fernet
 # from django.conf import settings
 
@@ -23,21 +22,6 @@ def get_bike_positions(request):
     bikes = Bike.objects.filter(is_available=True).values()
     return JsonResponse(
         {"bikes": list(bikes)}
-    )
-
-def get_polygons(request):
-    parkings = Parking.objects.all()
-    response = []
-    
-    for parking in parkings:
-        response.append(
-            {
-                "name": parking.name,
-                "coords": [{"lat":coord[0],"lng":coord[1]} for coord in parking.coords]
-            }
-        )
-    return JsonResponse(
-        {"polygons": list(response)}
     )
 
 def get_user_status(request):
@@ -90,6 +74,7 @@ def start_rental(request):
             bike = Bike.objects.get(id=data['bike_id'])
             if not Rental.objects.filter(is_completed=False).filter(user=user):
                 rental = Rental(user=user,bike=bike)
+                print(rental.bike)
                 rental.start_rental()
                 return JsonResponse(
                     {"message" : "Ride successfully started"}, status=200
@@ -105,23 +90,15 @@ def end_rental(request):
         try:
             user = request.user
             data = json.loads(request.body.decode('utf-8'))
-            coords = (data['lat'],data['lon'])
-            
             rental = Rental.objects.filter(is_completed=False).filter(user=user).first()
-            if valid_location(coords):
-                rental.end_rental(data['lat'],data['lon'])
-                return JsonResponse(
-                {"message" : f"You successfully finished your ride"}, status=200
-            )
-            else:
-                return JsonResponse(
-                {"message" : f"Can't end your ride here"}, status=400
-                )
+            rental.end_rental(data['lat'],data['lon'])
         except Exception as e:
-            print("its valid")
             return JsonResponse(
                 {"message" : f"Unable to end a ride, {e}"}, status=500
             )
-            
+        finally:
+            return JsonResponse(
+                {"message" : f"You successfully finished your ride"}, status=200
+            )
    
 
