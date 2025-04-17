@@ -23,7 +23,7 @@ You can define who is allowed to rent bikes, specify safe spots for locking them
 
 ### Prerequisites
 
-Make sure Docker is installed. You can download it from [here](https://www.docker.com/get-started).
+Make sure Docker is installed. You can download it from [here](https://www.docker.com/get-started)
 ```sh
 docker --version
 ```
@@ -56,8 +56,8 @@ docker --version
     ```
    You can also add `DJANGO_SUPERUSER_EMAIL` and `DJANGO_SUPERUSER_PASSWORD` for automatic superuser creation
 
-   > [!IMPORTANT]  
-   > Don't forget about creating a secret key and setting the `DJANGO_SECRET_KEY` in your environment variables.  Ensure that it is kept secure and never shared publicly.
+> [!IMPORTANT]  
+> Don't forget about creating a secret key and setting the `DJANGO_SECRET_KEY` in your environment variables.  Ensure that it is kept secure and never shared publicly.
 
 
 
