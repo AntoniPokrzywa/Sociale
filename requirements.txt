@@ -8,3 +8,4 @@ redgreenunittest
 factory_boy
 whitenoise
 django-cors-headers 
+coverage
