@@ -110,7 +110,6 @@ class ParkingApiTests(CustomAPITestCase):
     def test_parking_create_by_admin(self):
         self.authenticate(self.admin)
         response = self.parking_create(self.parking_data)
-        print(response.data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_parking_create_duplicate_name(self):

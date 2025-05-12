@@ -1,0 +1,72 @@
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+env:
+  POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+  POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+  POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+  POSTGRES_HOST: localhost  # It's a PostgreSQL service container, so localhost
+  POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
+  EMAIL_HOST: ${{ secrets.EMAIL_HOST }}
+  EMAIL_PORT: ${{ secrets.EMAIL_PORT }}
+  EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
+  EMAIL_USE_TLS: ${{ secrets.EMAIL_USE_TLS }}
+  DJANGO_SUPERUSER_EMAIL: ${{ secrets.DJANGO_SUPERUSER_EMAIL }}
+  DJANGO_SUPERUSER_PASSWORD: ${{ secrets.DJANGO_SUPERUSER_PASSWORD }}
+  DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+  FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
+  ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
+  DB_IGNORE_SSL: ${{ secrets.DB_IGNORE_SSL }}
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 2
+      matrix:
+        python-version: [3.12, 3.13]
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+        options: -p 5432:5432
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+          
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          until pg_isready -h localhost -p 5432 -U ${{ secrets.POSTGRES_USER }} -d ${{ secrets.POSTGRES_DB }}; do
+            echo "Waiting for PostgreSQL to be ready..."
+            sleep 2
+          done
+          
+      - name: Create Migrations
+        run: | 
+          python manage.py makemigrations users
+          python manage.py makemigrations rentals
+          python manage.py makemigrations parkings
+          python manage.py makemigrations bikes
+          python manage.py migrate
+
+      - name: Run tests with coverage
+        run: |
+          coverage run manage.py test
+          coverage report

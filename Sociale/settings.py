@@ -21,89 +21,83 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
-HOST = os.environ.get('HOST', default="0.0.0.0")
-DEBUG = os.environ.get('DEBUG', '0').lower() in ('true', '1', 'yes')
+HOST = os.environ.get("HOST", default="0.0.0.0")
+DEBUG = os.environ.get("DEBUG", "0").lower() in ("true", "1", "yes")
 
 TEST_RUNNER = "redgreenunittest.django.runner.RedGreenDiscoverRunner"
 
-EMAIL_HOST =  os.getenv('EMAIL_HOST')
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-EMAIL_PORT = os.getenv('EMAIL_PORT')
-EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', '1').lower() in ('true', '1', 'yes')
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+EMAIL_PORT = os.getenv("EMAIL_PORT")
+EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "1").lower() in ("true", "1", "yes")
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(',')
-AUTH_USER_MODEL = 'users.User'
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
+AUTH_USER_MODEL = "users.User"
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:3000")
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'corsheaders',
-    'users.apps.UsersConfig',
-    'parkings.apps.ParkingsConfig',
-    'bikes.apps.BikesConfig',
-    'rentals.apps.RentalsConfig',
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-
-    'rest_framework',
+    "corsheaders",
+    "users.apps.UsersConfig",
+    "parkings.apps.ParkingsConfig",
+    "bikes.apps.BikesConfig",
+    "rentals.apps.RentalsConfig",
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "rest_framework",
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
-INSTALLED_APPS = [
-    'corsheaders'
-]
-CORS_ORIGIN_WHITELIST = [
-     os.environ.get("FRONTEND_URL", 'http://localhost:3000')
-]
-ROOT_URLCONF = 'Sociale.urls'
+
+CORS_ORIGIN_WHITELIST = [FRONTEND_URL]
+ROOT_URLCONF = "Sociale.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-            os.path.join(BASE_DIR, 'utils', 'templates')
-        ],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [os.path.join(BASE_DIR, "utils", "templates")],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'Sociale.wsgi.application'
+WSGI_APPLICATION = "Sociale.wsgi.application"
 STATIC_URL = "static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"  
+STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
 DB_USERNAME = os.environ.get("POSTGRES_USER")
@@ -111,14 +105,8 @@ DB_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
 DB_DATABASE = os.environ.get("POSTGRES_DB")
 DB_HOST = os.environ.get("POSTGRES_HOST")
 DB_PORT = os.environ.get("POSTGRES_PORT")
-DB_IS_AVAIL = all([
-    DB_USERNAME,
-    DB_PASSWORD,
-    DB_DATABASE,
-    DB_HOST,
-    DB_PORT
-])
-DB_IGNORE_SSL=os.environ.get("DB_IGNORE_SSL") == "true"
+DB_IS_AVAIL = all([DB_USERNAME, DB_PASSWORD, DB_DATABASE, DB_HOST, DB_PORT])
+DB_IGNORE_SSL = os.environ.get("DB_IGNORE_SSL") == "true"
 
 if DB_IS_AVAIL:
     DATABASES = {
@@ -132,10 +120,7 @@ if DB_IS_AVAIL:
         }
     }
     if not DB_IGNORE_SSL:
-        DATABASES["default"]["OPTIONS"] = {
-            "sslmode": "require"
-         }
-
+        DATABASES["default"]["OPTIONS"] = {"sslmode": "require"}
 
 
 # Password validation
@@ -143,16 +128,16 @@ if DB_IS_AVAIL:
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -160,9 +145,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'Europe/Berlin'
+TIME_ZONE = "Europe/Berlin"
 
 USE_I18N = True
 
@@ -175,63 +160,68 @@ USE_TZ = True
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+DISABLE_LOGS = os.environ.get("DISABLE_LOGS", "true") in ["true", "yes", "1"]
 
-LOGLEVEL = os.environ.get('DJANGO_LOG_LEVEL', 'INFO').upper()
-LOG_DIR = os.path.join(BASE_DIR, 'logs')
+if DISABLE_LOGS:
+    LOGLEVEL = "CRITICAL"
+else:
+    LOGLEVEL = os.environ.get("DJANGO_LOG_LEVEL", "INFO").upper()
+
+LOG_DIR = os.path.join(BASE_DIR, "logs")
 if not os.path.exists(LOG_DIR):
     os.makedirs(LOG_DIR)
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'filters': {
-        'skip_options': {
-            '()': 'utils.logging.SkipOptionsRequestsFilter',
+    "version": 1,
+    "disable_existing_loggers": False,
+    "filters": {
+        "skip_options": {
+            "()": "utils.logging.SkipOptionsRequestsFilter",
         },
     },
-    'formatters': {
-        'simple': {
-            'format': '{levelname} {asctime} {module} {message} ',
-            'style': '{',
+    "formatters": {
+        "simple": {
+            "format": "{levelname} {asctime} {module} {message} ",
+            "style": "{",
         },
-        'custom': {
-            'format': "{levelname} {asctime} {module} {request_ip} {request.method} {request.path} {message}  ",
-            'style': '{',
-        },
-    },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple',
-        },
-        'file': {
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(LOG_DIR, 'debug.log'),
-            'formatter': 'simple',
-        },
-        'file_users': {
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(LOG_DIR, 'users.log'),
-            'formatter': 'custom',
-            'filters': ['skip_options'],
+        "custom": {
+            "format": "{levelname} {asctime} {module} {request_ip} {request.method} {request.path} {message}  ",
+            "style": "{",
         },
     },
-    'loggers': {
-        'django': {
-            'handlers': ['console', 'file'],
-            'level': LOGLEVEL,
-            'propagate': False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
         },
-        'django.request': {
-            'handlers': ['console', 'file'],
-            'level': 'ERROR',
-            'propagate': False,
+        "file": {
+            "class": "logging.FileHandler",
+            "filename": os.path.join(LOG_DIR, "debug.log"),
+            "formatter": "simple",
         },
-        'users': {
-            'handlers': ['console', 'file_users'],
-            'level': 'INFO',
-            'propagate': False,
+        "file_users": {
+            "class": "logging.FileHandler",
+            "filename": os.path.join(LOG_DIR, "users.log"),
+            "formatter": "custom",
+            "filters": ["skip_options"],
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console", "file"],
+            "level": LOGLEVEL,
+            "propagate": False,
+        },
+        "django.request": {
+            "handlers": ["console", "file"],
+            "level": LOGLEVEL,
+            "propagate": False,
+        },
+        "users": {
+            "handlers": ["console", "file_users"],
+            "level": LOGLEVEL,
+            "propagate": False,
         },
     },
 }
