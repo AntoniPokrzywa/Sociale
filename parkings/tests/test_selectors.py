@@ -34,7 +34,7 @@ class TestParkingSelectors(TestCase):
         self.assertIn(self.active_parking, parkings)
 
     def test_parking_get(self):
-        parking = parking_get(2)
+        parking = parking_get(self.inactive_parking.id)
         self.assertEqual(parking, self.inactive_parking)
 
     def test_parking_get_nonexistent(self):

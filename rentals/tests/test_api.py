@@ -68,7 +68,7 @@ class RentalApiTests(CustomAPITestCase):
         self.authenticate(user=self.admin)
         rental = TestRentalFactory.create(status="started")
         url = reverse("rentals:update", args=[rental.id])
-        response = self.client.put(url, data={"status": "finishe"})
+        response = self.client.put(url, data={"status": "finished"})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         rental.refresh_from_db()
         self.assertEqual(rental.status, "finished")

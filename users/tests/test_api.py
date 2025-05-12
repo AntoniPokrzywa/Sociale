@@ -18,7 +18,6 @@ class UserApiTests(CustomAPITestCase):
         return self.client.post(url, {"email": email, "password": password})
 
     def test_user_login(self):
-        print(self.active_user)
         response = self.login("chillguy@sociale.com", "ilovesociale")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
